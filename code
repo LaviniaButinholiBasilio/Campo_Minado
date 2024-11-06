@@ -1,0 +1,129 @@
+bicho = int(input('tamanho do bicho?'))
+def criar_tabuleiro(dimensao):
+    jogo = []
+    for _ in range(dimensao):
+        linha = []
+        for _ in range(dimensao):
+            linha.append('_')
+        jogo.append(linha)
+    return jogo
+
+def imprimir_tabuleiro(tabuleiro):
+    for linha in tabuleiro:
+        linha_str = ""
+        for elemento in linha:
+            linha_str += " " + elemento + " |"
+        print(linha_str[:-1])
+        print("-" * (4 * len(linha)))
+
+def campo_minado():
+    dimensao = bicho
+    tabuleiro = criar_tabuleiro(dimensao)
+    for i in range(len(tabuleiro)):
+        print(tabuleiro[i])
+
+
+def quantia_minas():
+    numero_minas = int(input('digite o numero de minas'))
+    if numero_minas <= 0:
+        print('NUMERO INVALIDO!!!!!!')
+    if numero_minas > (bicho*bicho) / 2:
+        print('NUMERO INVALIDO!!!!!!')
+    return numero_minas
+quantia_minas()
+campo_minado()
+
+
+
+
+import random
+
+def criar_tabuleiro(linhas, bombas):
+    tabuleiro = [[0 for _ in range(linhas)] for _ in range(linhas)]
+    bombas_colocadas = 0
+    while bombas_colocadas < bombas:
+        x = random.randint(0, linhas - 1)
+        y = random.randint(0, linhas - 1)
+        if tabuleiro[x][y] != -1:
+            tabuleiro[x][y] = -1
+            bombas_colocadas += 1
+            for i in range(max(0, x-1), min(linhas, x+2)):
+                for j in range(max(0, y-1), min(linhas, y+2)):
+                    if tabuleiro[i][j] != -1:
+                        tabuleiro[i][j] += 1
+    return tabuleiro
+
+def imprimir_tabuleiro(tabuleiro, mostrar_minas=False):
+    linhas = len(tabuleiro)
+    for i in range(linhas):
+        for j in range(linhas):
+            if tabuleiro[i][j] == -1 and mostrar_minas:
+                print('X', end=' ')
+            elif tabuleiro[i][j] < 0:
+                print('-', end=' ')
+            else:
+                print(tabuleiro[i][j], end=' ')
+        print()
+
+def abrir_celula(tabuleiro, x, y):
+    if tabuleiro[x][y] == -1:
+        return False  # jogo termina, jogador acertou uma mina
+    else:
+        tabuleiro[x][y] = -2  # célula aberta
+        return True
+
+def marcar_mina(tabuleiro, x, y):
+    if tabuleiro[x][y] >= 0:
+        tabuleiro[x][y] = -3  # marcar como mina
+        return True
+    else:
+        return False
+
+def desmarcar_mina(tabuleiro, x, y):
+    if tabuleiro[x][y] == -3:
+        tabuleiro[x][y] = 0  # desmarcar mina
+        return True
+    else:
+        return False
+
+def contar_minas_proximas(tabuleiro, x, y):
+    linhas = len(tabuleiro)
+    count = 0
+    for i in range(max(0, x-1), min(linhas, x+2)):
+        for j in range(max(0, y-1), min(linhas, y+2)):
+            if tabuleiro[i][j] == -1:
+                count += 1
+    return count
+
+# Inicialização do jogo
+linhas = int(input("Digite o número de linhas do tabuleiro: "))
+bombas_maximas = (linhas * linhas) // 2
+bombas = int(input(f"Digite o número de minas (entre 1 e {bombas_maximas}): "))
+while bombas < 1 or bombas > bombas_maximas:
+    bombas = int(input(f"Número inválido. Digite o número de minas (entre 1 e {bombas_maximas}): "))
+
+tabuleiro = criar_tabuleiro(linhas, bombas)
+imprimir_tabuleiro(tabuleiro)
+
+# Lógica do jogo
+while True:
+    x = int(input("Digite a linha a jogar (0 a {linhas-1}): "))
+    y = int(input("Digite a coluna a jogar (0 a {linhas-1}): "))
+    if x < 0 or x >= linhas or y < 0 or y >= linhas:
+        print("Jogada fora dos limites do tabuleiro.")
+        continue
+    if tabuleiro[x][y] == -2:
+        print("Essa célula já foi aberta.")
+        continue
+
+    acao = input("Deseja abrir a célula (o), marcar uma mina (m) ou desmarcar uma mina (d)? ")
+    if acao == 'o':
+        if not abrir_celula(tabuleiro, x, y):
+            print("Você acertou uma mina! Fim de jogo.")
+            imprimir_tabuleiro(tabuleiro, True)
+            break
+        else:
+            imprimir_tabuleiro(tabuleiro)
+            if all(-2 in linha for linha in tabuleiro):
+                print("Parabéns! Você abriu todas as células sem acertar nenhuma mina. Você venceu!")
+               
